@@ -1,0 +1,102 @@
+<html>
+    <head>
+        <title>SmartMotors Config</title>
+        
+    </head>
+    <boby>
+        <button id="button">connectar arduino</button>
+        <button id="btnLigar">Ligar led</button>
+        <button id="btnDesligar">Desligar led</button>
+    </boby>
+    <script>
+        class LineBreakTransformer {
+            constructor() {
+                // A container for holding stream data until a new line.
+                this.chunks = "";
+            }
+
+            transform(chunk, controller) {
+                // Append new chunks to existing chunks.
+                this.chunks += chunk;
+                // For each line breaks in chunks, send the parsed lines out.
+                const lines = this.chunks.split("\r\n");
+                this.chunks = lines.pop();
+                lines.forEach((line) => controller.enqueue(line));
+            }
+
+            flush(controller) {
+                // When the stream is closed, flush any remaining chunks out.
+                controller.enqueue(this.chunks);
+            }
+        }
+        class Experiment{
+        
+            constructor(){              
+                
+            }
+            async requestPort(){
+                this.port = await navigator.serial.requestPort();
+            }
+            async getAvailablePorts(){
+                this.availablePorts = await navigator.serial.getPorts();
+                return this.availablePorts;
+            }
+            async readSerial(){
+                let msg = "";
+                while (this.port.readable){
+                    this.textDecoder = new TextDecoderStream();
+                    this.readableStreamClosed = this.port.readable.pipeTo(this.textDecoder.writable);
+                    this.reader = this.textDecoder.readable
+                        .pipeThrough(new TransformStream(new LineBreakTransformer()))
+                        .getReader();
+                
+                    while (true) {
+                        const { value, done } = await this.reader.read();                 
+                        if (done) {
+                            this.reader.releaseLock();
+                            break;
+                        }
+                        let jsonObj = JSON.parse(value);
+                        console.log(jsonObj);
+                    }
+                }
+            }
+        }
+        
+        window.addEventListener('load', async function(event){
+            
+            let obj = new Experiment();
+            let ports = await obj.getAvailablePorts();
+            if(ports){
+                obj.port = ports[0];
+                await obj.port.open({ baudRate: 9600 });
+                console.log(obj.port);
+            }
+            
+            document.getElementById("button").addEventListener('click', async() => {   
+                await obj.requestPort();
+                if(obj.port){
+                    if (!obj.port.readable){
+                        await obj.port.open({ baudRate: 9600 });
+                    }
+                }
+            });
+
+            document.getElementById("btnLigar").addEventListener('click', async() => {
+                await obj.readSerial();
+                console.log(obj.serialString);
+            });
+
+            document.getElementById("btnDesligar").addEventListener('click', async() => {
+                obj.reader.cancel();
+                await obj.readableStreamClosed.catch(() => { /* Ignore the error */ });
+
+                obj.writer.close();
+                await obj.writableStreamClosed;
+                await obj.port.close();
+            });
+            
+        });
+        
+    </script>
+</html>
