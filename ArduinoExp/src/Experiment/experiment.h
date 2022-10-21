@@ -10,18 +10,27 @@ class Experiment {
     String name;
     String desc;
     int posVar = 0;
-    StaticJsonDocument<200> doc;
+    int posVarSensor = 0;
+    StaticJsonDocument<400> doc;
     JsonArray sensors;
     JsonArray variables;
-  //  Sensor sensors;
+    
 
   public:
+    static const int UPDATE_VAR;
+    static const int GET_STATE;
     Experiment(String name, String desc);
 
-  //  Sensor addSensor(byte pin, char name, int value);
-    void addVariable(String name, String defaultValue);
-    void updateVariable(String name, String newValue);
-    StaticJsonDocument<200> getDoc();
+    void addVariable(String name, String label, boolean defaultValue);
+    void addVariable(String name, String label, int defaultValue);
+    void updateVariable(String name, boolean newValue);
+    void updateVariable(String name, int newValue);
+    void addSensor(int pin, String name, int value);
+    void updateSensors();
+    template <typename T>
+    T getValue(String name);
+    void updateExperiment();
+    StaticJsonDocument<500> getDoc();
     
     
 };
