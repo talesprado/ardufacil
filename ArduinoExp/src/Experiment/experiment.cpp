@@ -1,5 +1,5 @@
 #include "experiment.h"
-#include EEPROM;
+#include <EEPROM.h>
 
 const int Experiment::UPDATE_VAR = 0;
 const int Experiment::GET_STATE = 1;
@@ -70,7 +70,29 @@ StaticJsonDocument<500> Experiment::getDoc(){
     return this->doc;
 }
 
-void readEepromToVariables(){
+void Experiment::writeVariablesToEeprom(){
+	bool isEepromWriten = true; //if values were saved to EEPROM
+	int posAddr = 0;
+	
+	EEPROM.put(posAddr, isEepromWriten);
+	posAddr += sizeof(bool);
+	if (isEepromWriten){
+	    for (int i=0; i < this->posVar; i++){
+			
+			if(this->variables[i]["type"] == "checkbox"){
+				bool varValue = this->variables[i]["value"];
+				EEPROM.put(posAddr, varValue);
+				posAddr += sizeof(bool);
+			}else if (this->variables[i]["type"] == "range"){
+				int varValue = this->variables[i]["value"];
+				EEPROM.put(posAddr, varValue);
+				posAddr += sizeof(int);
+			}
+		}
+	}
+}
+
+void Experiment::readEepromToVariables(){
     bool isEepromWriten; //if values were saved to EEPROM
 	int posAddr = 0;
 	
@@ -78,10 +100,16 @@ void readEepromToVariables(){
 	posAddr += sizeof(bool);
 	if (isEepromWriten){
 	    for (int i=0; i < this->posVar; i++){
-			this->variable["value"] = 
+			
 			if(this->variables[i]["type"] == "checkbox"){
+				bool varValue;
+				EEPROM.get(posAddr, varValue);
+				this->variables[i]["value"] = varValue;
 				posAddr += sizeof(bool);
 			}else if (this->variables[i]["type"] == "range"){
+				int varValue;
+				EEPROM.get(posAddr, varValue);
+				this->variables[i]["value"] = varValue;
 				posAddr += sizeof(int);
 			}
 		}
@@ -89,24 +117,23 @@ void readEepromToVariables(){
 }
 
 void Experiment::updateExperiment(){
-    StaticJsonDocument<200> com;
-    JsonObject obj;
-    bool newValueBool;
-    int newValueInt;
-    String varName;
-    if (Serial.available()){
-        deserializeJson(com, Serial);
-    if (com["action"] == "update"){
-      serializeJson(this->getDoc(), Serial);
-      Serial.print("/EOJO");
+  StaticJsonDocument<150> com;
+  JsonObject obj;
+  bool newValueBool;
+  int newValueInt;
+  com["action"] = "";
+  if (Serial.available()){
+    deserializeJson(com, Serial);
+	//serializeJson(com, Serial);
+	if (com["action"] == "update"){
+	  serializeJson(this->getDoc(), Serial);
+	  Serial.println("/EOJO");
     }else if (com["action"] == "update_var"){
-      
       obj = com["variable"].as<JsonObject>();
-      
-      for (JsonPair p : obj){
+	  for (JsonPair p : obj){
         if(p.key() == "value"){
-          if(p.value().is<bool>()){
-            newValueBool = p.value();
+	      if(p.value().is<bool>()){
+		    newValueBool = p.value();
             this->updateVariable(com["variable"]["name"], newValueBool); 
           }else if(p.value().is<int>()){
             newValueInt = p.value();
@@ -115,8 +142,10 @@ void Experiment::updateExperiment(){
         }
       }
       serializeJson(this->getDoc(), Serial);
-      Serial.print("/EOJO");
-      
-     }    
+      Serial.println("/EOJO"); 
+    } else {
+		Serial.flush();
+	}
+	com["action"] = "";
   } 
 }
