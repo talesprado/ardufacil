@@ -11,7 +11,7 @@ class Experiment {
     String desc;
     int posVar = 0;
     int posVarSensor = 0;
-    StaticJsonDocument<400> doc;
+    StaticJsonDocument<500> doc;
     JsonArray sensors;
     JsonArray variables;
     
@@ -26,6 +26,8 @@ class Experiment {
     void updateVariable(String name, boolean newValue);
     void updateVariable(String name, int newValue);
     void addSensor(int pin, String name, int value);
+	void writeVariablesToEeprom();
+	void readEepromToVariables();
     void updateSensors();
     template <typename T>
     T getValue(String name);
