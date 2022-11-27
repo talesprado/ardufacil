@@ -2,8 +2,8 @@
 ![Arduino Board](/assets/images/Arduino-uno.png)
 
 Ardufácil se trata de uma ferramenta que permite a parametrização de um programa Arduíno. Ele se divide em duas partes:
-1. Uma biblioteca C++ que facilita a criação de um programa parametrizável
-2. Uma página frontend que lê os parâmetros que podem ser redefinidos e os apresenta para um usuário final
+1. Uma [biblioteca C++](https://github.com/talesprado/ardufacil-cpp) que facilita a criação de um programa parametrizável
+2. Uma [página frontend](https://talesprado.github.io/ardufacil/public/) que lê os parâmetros que podem ser redefinidos e os apresenta para um usuário final
 
 ## Aplicações
 
