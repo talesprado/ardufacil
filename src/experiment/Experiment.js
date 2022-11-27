@@ -26,14 +26,6 @@ const Experiment = ({ experiment = [],
     }, [isBoardConnected]);
     useEffect(() => {
         onClickDisconnect();
-      /*  startLoadingExperiment();
-        
-             interval = setInterval(() => {
-                if(isBoardConnected){
-                 onClickRequestExperiment();
-              }}, 300);
-              
-              return () => clearInterval(interval);   */
     }, [])
 
     let connectionContent = <Instructions />;
@@ -46,7 +38,12 @@ const Experiment = ({ experiment = [],
     }
   let contentExp = <></>;
   if (isBoardConnected){
-      
+      let sensors = (experiment.sensors) ? experiment.sensors.map( sensor => <div key={sensor.name} className="input-field col s6">          
+                                                                                <input id="icon_telephone" type="numeric" disabled={true} value={sensor.value} />
+                                                                                <label className="active" htmlFor="icon_telephone">{sensor.name}</label>
+                                                                            </div> ) :  '' ;
+
+        let parameters = (experiment.variables ? experiment.variables.map( variable => <VarInput key={variable.name} variable={variable} /> ) : '' );
       contentExp = <><div className='row'>
                       <div className='col s12 m12 z-depth-1'>
                           <p><span> Experiência: </span>{experiment.name}</p>
@@ -57,14 +54,11 @@ const Experiment = ({ experiment = [],
                       <div className='col s12 m12 z-depth-1'>
                           <div className='col s6 m6'>
                               <h5>Sensores</h5>
-                              {experiment.sensors.map( sensor => <div key={sensor.name} className="input-field col s6">          
-                                                                          <input id="icon_telephone" type="numeric" disabled={true} value={sensor.value} />
-                                                                          <label className="active" htmlFor="icon_telephone">{sensor.name}</label>
-                                                                  </div> )}
+                              {sensors}
                           </div>
                           <div className='col s6 m6'>
                               <h5>Variáveis</h5>
-                              {experiment.variables.map( variable => <VarInput key={variable.name} variable={variable} /> )}
+                              {parameters}
                               <br />
                           </div>
                       </div>
@@ -73,15 +67,14 @@ const Experiment = ({ experiment = [],
   
     const content = (
         <div className='container'>
-            {isLoading ? <Icon tiny className='orange-text text-lighten-3'>update</Icon>: <Icon tiny className='white-text text-lighten-7'>update</Icon> }
             <div className='row'>
                 <div className='col s12 m12 z-depth-1'>
-                    <h5>Conexão</h5>
+                    <h5>{isBoardConnected ? 'Instruções' : 'Conexão'}</h5>
                     {connectionContent}
                 </div>
             </div>
             {contentExp}
-           <Button waves='light' id="btnSave" onClick={() => onClickSave()}>Salvar</Button>
+           {(isBoardConnected) ? <Button waves='light' id="btnSave" onClick={() => onClickSave()}>Salvar</Button> : <></>}
         </div>
     );
     
