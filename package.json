@@ -1,0 +1,40 @@
+{
+  "name": "react-arduino",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npx webpack-dev-server --mode development",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/cli": "^7.17.6",
+    "@babel/core": "^7.17.5",
+    "@babel/plugin-transform-runtime": "^7.17.0",
+    "@babel/preset-env": "^7.16.11",
+    "@babel/preset-react": "^7.16.7",
+    "babel-loader": "^8.2.3",
+    "css-loader": "^3.4.2",
+    "react-hot-loader": "^4.13.0",
+    "style-loader": "^1.1.3",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.10.1"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.17.2",
+    "materialize-css": "^1.0.0-rc.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-materialize": "^3.10.0",
+    "react-redux": "^7.2.6",
+    "redux": "^4.1.2",
+    "redux-devtools-extension": "^2.13.9",
+    "redux-persist": "^6.0.0",
+    "redux-thunk": "^2.4.1",
+    "reselect": "^4.1.5"
+  }
+}
